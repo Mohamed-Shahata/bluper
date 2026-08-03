@@ -4,5 +4,6 @@ dist
 .next
 .env
 .env.*
+!.env.example
 coverage
 .turbo
