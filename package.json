@@ -1,20 +1,24 @@
 {
-  "name": "Bluper",
+  "name": "bluper",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI-powered Software Architecture Platform",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.18.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.18.0",
-      "onFail": "download"
-    }
+  "devDependencies": {
+    "turbo": "^2.6.1",
+    "typescript": "^5.7.3"
   },
-  "type": "module"
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=11.18.0"
+  }
 }
