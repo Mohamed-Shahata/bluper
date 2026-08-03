@@ -6,3 +6,252 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  projects     Project[]
+}
+
+model Project {
+  id                 String              @id @default(uuid()) @db.Uuid
+  userId             String              @db.Uuid
+  name               String
+  description        String?
+  domain             String?
+  goals              Json?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
+  user               User                @relation(fields: [userId], references: [id])
+  projectDescription ProjectDescription?
+  questions          Question[]
+  recommendations    Recommendation[]
+  requirements       Requirement[]
+  workflowExecutions WorkflowExecution[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ProjectDescription {
+  id        String   @id @default(uuid()) @db.Uuid
+  projectId String   @unique @db.Uuid
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Requirement {
+  id          String              @id @default(uuid()) @db.Uuid
+  projectId   String              @db.Uuid
+  type        RequirementType
+  priority    RequirementPriority @default(medium)
+  title       String
+  description String
+  source      String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  questions   Question[]
+  project     Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model Question {
+  id            String           @id @default(uuid()) @db.Uuid
+  projectId     String           @db.Uuid
+  requirementId String?          @db.Uuid
+  prompt        String
+  options       Json?
+  defaultValue  String?
+  required      Boolean          @default(true)
+  priority      QuestionPriority @default(medium)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  project       Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirement   Requirement?     @relation(fields: [requirementId], references: [id])
+  answers       QuestionAnswer[]
+
+  @@index([projectId])
+  @@index([requirementId])
+  @@index([createdAt])
+}
+
+model QuestionAnswer {
+  id         String   @id @default(uuid()) @db.Uuid
+  questionId String   @db.Uuid
+  answer     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@index([createdAt])
+}
+
+model WorkflowExecution {
+  id               String            @id @default(uuid()) @db.Uuid
+  projectId        String            @db.Uuid
+  status           WorkflowStatus    @default(pending)
+  startedAt        DateTime?
+  endedAt          DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  agentExecutions  AgentExecution[]
+  blueprint        Blueprint?
+  executionContext ExecutionContext?
+  project          Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ExecutionContext {
+  id                  String            @id @default(uuid()) @db.Uuid
+  workflowExecutionId String            @unique @db.Uuid
+  context             Json
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  workflowExecution   WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)
+
+  @@index([workflowExecutionId])
+  @@index([createdAt])
+}
+
+model AgentExecution {
+  id                  String            @id @default(uuid()) @db.Uuid
+  workflowExecutionId String            @db.Uuid
+  agentId             String
+  status              AgentStatus       @default(pending)
+  input               Json?
+  output              Json?
+  error               Json?
+  retryCount          Int               @default(0)
+  startedAt           DateTime?
+  endedAt             DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  workflowExecution   WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)
+
+  @@index([workflowExecutionId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Blueprint {
+  id                  String             @id @default(uuid()) @db.Uuid
+  workflowExecutionId String             @unique @db.Uuid
+  status              BlueprintStatus    @default(draft)
+  title               String
+  summary             String?
+  content             Json?
+  completedAt         DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  workflowExecution   WorkflowExecution  @relation(fields: [workflowExecutionId], references: [id])
+  sections            BlueprintSection[]
+
+  @@index([workflowExecutionId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BlueprintSection {
+  id          String               @id @default(uuid()) @db.Uuid
+  blueprintId String               @db.Uuid
+  type        BlueprintSectionType
+  title       String
+  content     Json
+  sortOrder   Int
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  blueprint   Blueprint            @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+
+  @@unique([blueprintId, type])
+  @@index([blueprintId])
+  @@index([createdAt])
+}
+
+model Recommendation {
+  id        String             @id @default(uuid()) @db.Uuid
+  projectId String             @db.Uuid
+  type      RecommendationType
+  title     String
+  content   Json
+  rationale String?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  project   Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+enum WorkflowStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+enum AgentStatus {
+  pending
+  running
+  completed
+  retryRequired
+  failed
+}
+
+enum RequirementType {
+  functional
+  nonFunctional
+}
+
+enum RequirementPriority {
+  low
+  medium
+  high
+  critical
+}
+
+enum QuestionPriority {
+  low
+  medium
+  high
+  critical
+}
+
+enum BlueprintStatus {
+  draft
+  completed
+  failed
+}
+
+enum BlueprintSectionType {
+  requirements
+  architecture
+  modules
+  technology
+  database
+  api
+  security
+  documentation
+  roadmap
+}
+
+enum RecommendationType {
+  technologyStack
+  architectureStyle
+  designPattern
+}
