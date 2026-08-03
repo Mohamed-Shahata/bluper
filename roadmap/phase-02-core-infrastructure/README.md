@@ -4,7 +4,7 @@
 | -------- | ------------------- |
 | Phase    | 02                  |
 | Name     | Core Infrastructure |
-| Status   | Not Started         |
+| Status   | In Progress         |
 | Priority | Critical            |
 
 ---
@@ -19,11 +19,18 @@ No AI workflow or business features should be implemented before this phase is c
 
 ---
 
+# Progress
+
+- Completed Tasks: 1 / 10
+- Current Task: TASK-202 - Configure Prisma ORM
+
+---
+
 # Epics
 
 | ID       | Epic                    | Status      |
 | -------- | ----------------------- | ----------- |
-| EPIC-200 | Database Infrastructure | Not Started |
+| EPIC-200 | Database Infrastructure | In Progress |
 | EPIC-210 | Shared Packages         | Not Started |
 | EPIC-220 | Backend Bootstrap       | Not Started |
 
@@ -41,7 +48,7 @@ Prepare the persistence layer and establish the project's database foundation.
 
 **Status**
 
-Not Started
+Completed
 
 **Type**
 
@@ -70,8 +77,8 @@ Configure PostgreSQL as the primary relational database for Bluper.
 
 **Acceptance Criteria**
 
-- [ ] Database accessible
-- [ ] Connection successful
+- [x] Database accessible
+- [x] Connection successful
 
 **References**
 
@@ -90,7 +97,7 @@ docker-compose.yml
 
 **Status**
 
-Not Started
+In Progress
 
 **Type**
 
