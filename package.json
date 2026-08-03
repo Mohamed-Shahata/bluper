@@ -13,6 +13,8 @@
     "lint:root": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "prisma": "prisma",
+    "prisma:generate": "prisma generate",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
@@ -22,6 +24,7 @@
     "eslint-config-prettier": "^10.0.1",
     "globals": "^17.0.0",
     "prettier": "^3.4.2",
+    "prisma": "^7.9.1",
     "turbo": "^2.6.1",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
@@ -29,5 +32,8 @@
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=11.18.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.9.1"
   }
 }
